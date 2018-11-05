@@ -20,7 +20,6 @@ class TemplateManager
         $APPLICATION_CONTEXT = ApplicationContext::getInstance();
 
         $quote = (isset($data['quote']) and $data['quote'] instanceof Quote) ? $data['quote'] : null;
-
         if ($quote)
         {
             /* KEEP IN CASE OF OTHER USE THAN QUOTE ID*/
@@ -28,32 +27,17 @@ class TemplateManager
             $site = SiteRepository::getInstance()->getById($quote->siteId);
             $destination = DestinationRepository::getInstance()->getById($quote->destinationId);
 
-            $containsSummaryHtml = strpos($text, '[quote:summary_html]');
-            $containsSummary     = strpos($text, '[quote:summary]');
+            $text = $this->replaceText($text, '[quote:summary_html]', Quote::renderHtml($quote));
+            $text = $this->replaceText($text, '[quote:summary]', Quote::renderText($quote));
 
-            if ($containsSummaryHtml !== false || $containsSummary !== false) {
-                if ($containsSummaryHtml !== false) {
-                    $text = str_replace(
-                        '[quote:summary_html]',
-                        Quote::renderHtml($quote),
-                        $text
-                    );
-                }
-                if ($containsSummary !== false) {
-                    $text = str_replace(
-                        '[quote:summary]',
-                        Quote::renderText($quote),
-                        $text
-                    );
-                }
+            if ($destination)
+                $text = $this->replaceText($text, '[quote:destination_name]', $destination->countryName);
+
+            if ($destination && $site)
+            {
+                $link = $site->url . '/' . $destination->countryName . '/quote/' . $quote->id;
+                $text = $this->replaceText($text, '[quote:destination_link]', $link);
             }
-
-            (strpos($text, '[quote:destination_name]') !== false) and $text = str_replace('[quote:destination_name]',$destination->countryName,$text);
-
-            if (isset($destination))
-                $text = str_replace('[quote:destination_link]', $site->url . '/' . $destination->countryName . '/quote/' . $quote->id, $text);
-            else
-                $text = str_replace('[quote:destination_link]', '', $text);
         }
 
         /*
@@ -61,9 +45,17 @@ class TemplateManager
          * [user:*]
          */
         $_user  = (isset($data['user'])  and ($data['user']  instanceof User))  ? $data['user']  : $APPLICATION_CONTEXT->getCurrentUser();
+        if($_user)
+            $text = $this->replaceText($text, '[user:first_name]', ucfirst(mb_strtolower($_user->firstname)));
 
-        if($_user) {
-            (strpos($text, '[user:first_name]') !== false) and $text = str_replace('[user:first_name]'       , ucfirst(mb_strtolower($_user->firstname)), $text);
+        return $text;
+    }
+
+    private function replaceText($text, $needle, $replace)
+    {
+        if (strpos($text, $needle) !== false)
+        {
+            $text = str_replace($needle, $replace, $text);
         }
 
         return $text;
