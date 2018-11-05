@@ -49,18 +49,19 @@ class TemplateManager
             }
 
             (strpos($text, '[quote:destination_name]') !== false) and $text = str_replace('[quote:destination_name]',$destination->countryName,$text);
-        }
 
-        if (isset($destination))
-            $text = str_replace('[quote:destination_link]', $site->url . '/' . $destination->countryName . '/quote/' . $quote->id, $text);
-        else
-            $text = str_replace('[quote:destination_link]', '', $text);
+            if (isset($destination))
+                $text = str_replace('[quote:destination_link]', $site->url . '/' . $destination->countryName . '/quote/' . $quote->id, $text);
+            else
+                $text = str_replace('[quote:destination_link]', '', $text);
+        }
 
         /*
          * USER
          * [user:*]
          */
         $_user  = (isset($data['user'])  and ($data['user']  instanceof User))  ? $data['user']  : $APPLICATION_CONTEXT->getCurrentUser();
+
         if($_user) {
             (strpos($text, '[user:first_name]') !== false) and $text = str_replace('[user:first_name]'       , ucfirst(mb_strtolower($_user->firstname)), $text);
         }
