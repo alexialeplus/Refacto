@@ -27,16 +27,19 @@ class TemplateManager
             $site = SiteRepository::getInstance()->getById($quote->siteId);
             $destination = DestinationRepository::getInstance()->getById($quote->destinationId);
 
-            $text = $this->replaceText($text, '[quote:summary_html]', Quote::renderHtml($quote));
-            $text = $this->replaceText($text, '[quote:summary]', Quote::renderText($quote));
+            /* Put all placeholders to replace here like this : '[placeholder]' => 'your text'*/
+            $textToReplace = array(
+                '[quote:summary_html]' => Quote::renderHtml($quote),
+                '[quote:summary]' => Quote::renderText($quote),
+            );
 
             if ($destination)
-                $text = $this->replaceText($text, '[quote:destination_name]', $destination->countryName);
+                $textToReplace['[quote:destination_name]'] = $destination->countryName;
 
             if ($destination && $site)
             {
                 $link = $site->url . '/' . $destination->countryName . '/quote/' . $quote->id;
-                $text = $this->replaceText($text, '[quote:destination_link]', $link);
+                $textToReplace['[quote:destination_link]'] = $link;
             }
         }
 
@@ -46,7 +49,13 @@ class TemplateManager
          */
         $_user  = (isset($data['user'])  and ($data['user']  instanceof User))  ? $data['user']  : $APPLICATION_CONTEXT->getCurrentUser();
         if($_user)
-            $text = $this->replaceText($text, '[user:first_name]', ucfirst(mb_strtolower($_user->firstname)));
+            $textToReplace['[user:first_name]'] = ucfirst(mb_strtolower($_user->firstname));
+
+
+        foreach ($textToReplace as $needle => $replace)
+        {
+            $text = $this->replaceText($text, $needle, $replace);
+        }
 
         return $text;
     }
