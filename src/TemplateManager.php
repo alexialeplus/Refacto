@@ -25,8 +25,8 @@ class TemplateManager
         {
             /* KEEP IN CASE OF OTHER USE THAN QUOTE ID*/
             /*$_quoteFromRepository = QuoteRepository::getInstance()->getById($quote->id);*/
-            $usefulObject = SiteRepository::getInstance()->getById($quote->siteId);
-            $destinationOfQuote = DestinationRepository::getInstance()->getById($quote->destinationId);
+            $site = SiteRepository::getInstance()->getById($quote->siteId);
+            $destination = DestinationRepository::getInstance()->getById($quote->destinationId);
 
             $containsSummaryHtml = strpos($text, '[quote:summary_html]');
             $containsSummary     = strpos($text, '[quote:summary]');
@@ -48,11 +48,11 @@ class TemplateManager
                 }
             }
 
-            (strpos($text, '[quote:destination_name]') !== false) and $text = str_replace('[quote:destination_name]',$destinationOfQuote->countryName,$text);
+            (strpos($text, '[quote:destination_name]') !== false) and $text = str_replace('[quote:destination_name]',$destination->countryName,$text);
         }
 
         if (isset($destination))
-            $text = str_replace('[quote:destination_link]', $usefulObject->url . '/' . $destinationOfQuote->countryName . '/quote/' . $quote->id, $text);
+            $text = str_replace('[quote:destination_link]', $site->url . '/' . $destination->countryName . '/quote/' . $quote->id, $text);
         else
             $text = str_replace('[quote:destination_link]', '', $text);
 
