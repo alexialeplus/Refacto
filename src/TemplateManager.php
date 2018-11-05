@@ -30,6 +30,7 @@ class TemplateManager
     private function computeText($text, array $data)
     {
         $APPLICATION_CONTEXT = ApplicationContext::getInstance();
+        $textToReplace = array();
 
         $quote = (isset($data['quote']) and $data['quote'] instanceof Quote) ? $data['quote'] : null;
         if ($quote)
