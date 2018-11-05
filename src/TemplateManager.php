@@ -2,6 +2,12 @@
 
 class TemplateManager
 {
+    /**
+     * @param Template $tpl
+     * @param array $data
+     *
+     * @return Template
+     */
     public function getTemplateComputed(Template $tpl, array $data)
     {
         if (!$tpl) {
@@ -15,6 +21,12 @@ class TemplateManager
         return $replaced;
     }
 
+    /**
+     * @param string $text
+     * @param array $data
+     *
+     * @return string Final text with replaced values
+     */
     private function computeText($text, array $data)
     {
         $APPLICATION_CONTEXT = ApplicationContext::getInstance();
@@ -60,6 +72,15 @@ class TemplateManager
         return $text;
     }
 
+    /**
+     * Look for a placeholder and replace it
+     *
+     * @param string $text
+     * @param string $needle
+     * @param string $replace
+     *
+     * @return string Final text with replaced values
+     */
     private function replaceText($text, $needle, $replace)
     {
         if (strpos($text, $needle) !== false)
